@@ -124,8 +124,8 @@ const NPCS: NpcSpec[] = [
   { kind: "nurse", position: new Vector3(-4, 0, 18), heading: 0, patrol: { from: new Vector3(-4, 0, 16), to: new Vector3(-4, 0, 56), speed: 2.2 } },
   { kind: "patient", position: new Vector3(7.1, 0, 10.2), heading: -Math.PI / 2 },
   { kind: "patient", position: new Vector3(-7.1, 0, 37.8), heading: Math.PI / 2 },
-  { kind: "patient", position: new Vector3(8.3, 1.45, 4.0), heading: Math.PI, pose: "lying" },
-  { kind: "patient", position: new Vector3(-8.3, 1.45, 30.4), heading: Math.PI, pose: "lying" },
+  { kind: "patient", position: new Vector3(8.3, 1.45, 5.5), heading: 0, pose: "lying" },
+  { kind: "patient", position: new Vector3(-8.3, 1.45, 31.9), heading: 0, pose: "lying" },
 ];
 
 // Ambient NPCs: a nurse at the station, a nurse on rounds, patients waiting or in gurneys.
