@@ -41,5 +41,6 @@ export const ASSETS = {
     doctor: `${BASE}/game-assets/3d/doctor.glb`,
     nurse: `${BASE}/game-assets/3d/nurse.glb`,
     patient: `${BASE}/game-assets/3d/patient.glb`,
+    wardBay: `${BASE}/game-assets/3d/ward-bay.glb`,
   },
 } as const;

@@ -116,6 +116,25 @@ def export(path, animations=False):
     print("exported", path, os.path.getsize(path))
 
 
+def join_and_export(path):
+    # One mesh, one primitive per material: keeps Babylon draw calls low.
+    meshes = [o for o in bpy.context.scene.objects if o.type == "MESH"]
+    for o in meshes:
+        bpy.context.view_layer.objects.active = o
+        for mod in list(o.modifiers):
+            bpy.ops.object.modifier_apply(modifier=mod.name)
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in meshes:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = meshes[0]
+    bpy.ops.object.parent_clear(type="CLEAR_KEEP_TRANSFORM")
+    bpy.ops.object.join()
+    bpy.context.active_object.name = os.path.splitext(os.path.basename(path))[0]
+    for o in [o for o in bpy.context.scene.objects if o.type == "EMPTY"]:
+        bpy.data.objects.remove(o)
+    export(path)
+
+
 # ---------------------------------------------------------------- world
 
 def build_world():
@@ -247,22 +266,95 @@ def build_world():
     monitor("stationMonitorB", 1.6, 70.6)
     box("stationSignBar", (6.0, 0.6, 0.15), (0, 5.4, 69.4), stripe, bevel=0.04)
 
-    # One mesh, one primitive per material: keeps Babylon draw calls low.
-    meshes = [o for o in bpy.context.scene.objects if o.type == "MESH"]
-    for o in meshes:
-        bpy.context.view_layer.objects.active = o
-        for mod in list(o.modifiers):
-            bpy.ops.object.modifier_apply(modifier=mod.name)
-    bpy.ops.object.select_all(action="DESELECT")
-    for o in meshes:
-        o.select_set(True)
-    bpy.context.view_layer.objects.active = meshes[0]
-    bpy.ops.object.parent_clear(type="CLEAR_KEEP_TRANSFORM")
-    bpy.ops.object.join()
-    bpy.context.active_object.name = "hospitalWorld"
-    for o in [o for o in bpy.context.scene.objects if o.type == "EMPTY"]:
-        bpy.data.objects.remove(o)
-    export(os.path.join(OUT, "hospital-world.glb"))
+    join_and_export(os.path.join(OUT, "hospital-world.glb"))
+
+
+# ---------------------------------------------------------------- ward bay (inside each level room)
+
+WARD_BAY_WIDTH = 60.0
+WARD_BED_X = [7.4, 18.4, 29.15, 40.05, 51.1]  # keep in sync with LevelBuilder BED_X_IN_TILE
+WARD_BED_Z = 9.0
+
+
+def build_ward():
+    """One 60-unit ward bay, floor at y=0, x 0..60, back wall at z=12.5. Tiled by the game."""
+    reset()
+    floor_a = mat("wardFloorA", "#d9e2e0", 0.5)
+    floor_b = mat("wardFloorB", "#c6d3d1", 0.5)
+    wall = mat("wardWallTint", "#cfe0e4", 0.9)  # tinted per level in Babylon
+    dado = mat("wardDado", "#4f7d95", 0.8)
+    trim = mat("wardTrim", "#2d4552", 0.6)
+    steel = mat("steel", "#aeb7bd", 0.35, 0.8)
+    sheet = mat("bedSheet", "#f6f4ee", 0.9)
+    blanket = mat("blanket", "#7fb3c8", 0.9)
+    curtain = mat("curtain", "#8cc7b8", 0.95)
+    glass = mat("windowGlass", "#bfe3ef", 0.1, emit=1.4)
+    screen = mat("monitorScreen", "#3fe0a8", 0.2, emit=2.5)
+    lamp = mat("bedLamp", "#fff4cc", 0.4, emit=2.0)
+    wood = mat("wood", "#a8774c", 0.6)
+    cabinet = mat("cabinet", "#eee6d3", 0.6)
+    chair = mat("chairTeal", "#2f8f8a", 0.5)
+    gas = mat("gasPanel", "#dfe7ea", 0.4)
+
+    tile = 4.0
+    for ix in range(int(WARD_BAY_WIDTH / tile)):
+        for iz in range(4):
+            m = floor_a if (ix + iz) % 2 == 0 else floor_b
+            box(f"wf_{ix}_{iz}", (tile, 0.1, tile), (tile / 2 + ix * tile, -0.05, -2 + tile / 2 + iz * tile), m)
+
+    wz = 12.5
+    box("wallBack", (WARD_BAY_WIDTH, 10.0, 0.4), (WARD_BAY_WIDTH / 2, 5.0, wz + 0.2), wall)
+    box("wallDado", (WARD_BAY_WIDTH, 2.4, 0.1), (WARD_BAY_WIDTH / 2, 1.2, wz - 0.05), dado)
+    box("wallRail", (WARD_BAY_WIDTH, 0.15, 0.2), (WARD_BAY_WIDTH / 2, 2.45, wz - 0.1), trim)
+    box("wallSkirting", (WARD_BAY_WIDTH, 0.3, 0.15), (WARD_BAY_WIDTH / 2, 0.15, wz - 0.12), trim)
+    box("ceilingTrim", (WARD_BAY_WIDTH, 0.4, 0.3), (WARD_BAY_WIDTH / 2, 9.6, wz - 0.1), trim)
+
+    # Windows between beds.
+    for i in range(len(WARD_BED_X) - 1):
+        x = (WARD_BED_X[i] + WARD_BED_X[i + 1]) / 2
+        box(f"winFrame{i}", (3.6, 3.4, 0.2), (x, 5.6, wz - 0.1), trim, bevel=0.04)
+        box(f"winGlass{i}", (3.2, 3.0, 0.22), (x, 5.6, wz - 0.12), glass)
+        box(f"winMullion{i}", (0.1, 3.0, 0.24), (x, 5.6, wz - 0.13), trim)
+        box(f"winSill{i}", (4.0, 0.15, 0.5), (x, 3.85, wz - 0.3), cabinet)
+
+    for i, x in enumerate(WARD_BED_X):
+        z = WARD_BED_Z
+        # Bed: head against back wall.
+        box(f"bed{i}_frame", (2.4, 0.3, 4.6), (x, 1.0, z), steel, bevel=0.05)
+        box(f"bed{i}_mattress", (2.2, 0.4, 4.4), (x, 1.35, z), sheet, bevel=0.12)
+        box(f"bed{i}_blanket", (2.3, 0.22, 2.6), (x, 1.6, z - 0.8), blanket, bevel=0.1)
+        box(f"bed{i}_pillow", (1.5, 0.35, 0.8), (x, 1.75, z + 1.7), sheet, bevel=0.14)
+        box(f"bed{i}_head", (2.5, 2.0, 0.18), (x, 1.9, z + 2.3), steel, bevel=0.05)
+        box(f"bed{i}_foot", (2.5, 1.2, 0.18), (x, 1.5, z - 2.3), steel, bevel=0.05)
+        for lx in (-1.0, 1.0):
+            for lz in (-2.0, 2.0):
+                cyl(f"bed{i}_wheel{lx}{lz}", 0.16, 0.12, (x + lx, 0.16, z + lz), trim, verts=10, axis="x")
+                cyl(f"bed{i}_leg{lx}{lz}", 0.06, 0.8, (x + lx, 0.6, z + lz), steel, verts=8)
+        # Wall services: gas panel, monitor, reading lamp.
+        box(f"bed{i}_gas", (3.6, 0.6, 0.15), (x, 3.3, wz - 0.12), gas, bevel=0.03)
+        for k, c in enumerate(("#3f8fd0", "#3fbf7a", "#e0c040")):
+            cyl(f"bed{i}_outlet{k}", 0.09, 0.1, (x - 0.8 + k * 0.8, 3.3, wz - 0.22), mat(f"outlet{k}", c, 0.4), verts=8, axis="z")
+        box(f"bed{i}_monCase", (1.3, 0.95, 0.25), (x + 1.9, 5.0, wz - 0.2), trim, bevel=0.05)
+        box(f"bed{i}_monScreen", (1.1, 0.75, 0.05), (x + 1.9, 5.0, wz - 0.34), screen)
+        box(f"bed{i}_lamp", (1.6, 0.18, 0.5), (x, 7.4, wz - 0.3), lamp, bevel=0.04)
+        # Privacy curtain on a ceiling rail, drawn to the left of the bed.
+        box(f"bed{i}_rail", (0.08, 0.08, 6.0), (x - 2.9, 9.0, z - 0.5), steel)
+        for f in range(5):
+            box(f"bed{i}_curtain{f}", (0.12, 7.6, 0.75), (x - 2.9 + (0.08 if f % 2 else -0.08), 5.0, z + 2.3 - f * 0.7), curtain)
+        # Bedside cabinet, IV stand, visitor chair.
+        box(f"bed{i}_cab", (1.0, 1.6, 1.0), (x + 1.9, 0.8, z + 1.6), cabinet, bevel=0.06)
+        box(f"bed{i}_cabTop", (1.1, 0.08, 1.1), (x + 1.9, 1.64, z + 1.6), wood)
+        box(f"bed{i}_cup", (0.2, 0.3, 0.2), (x + 1.8, 1.83, z + 1.4), mat("cup", "#e86f4f", 0.5))
+        cyl(f"bed{i}_ivPole", 0.05, 4.0, (x - 1.7, 2.0, z + 1.2), steel, verts=8)
+        cyl(f"bed{i}_ivBase", 0.5, 0.08, (x - 1.7, 0.05, z + 1.2), steel, verts=10)
+        box(f"bed{i}_ivBag", (0.4, 0.6, 0.14), (x - 1.7, 3.7, z + 1.2), mat("ivBag", "#dff3f7", 0.2), bevel=0.04)
+        box(f"bed{i}_chairSeat", (1.0, 0.18, 1.0), (x + 2.4, 1.0, z - 1.4), chair, bevel=0.05)
+        box(f"bed{i}_chairBack", (1.0, 1.0, 0.16), (x + 2.4, 1.55, z - 0.95), chair, bevel=0.05)
+        for lx in (-0.4, 0.4):
+            for lz in (-0.4, 0.4):
+                box(f"bed{i}_chairLeg{lx}{lz}", (0.08, 0.92, 0.08), (x + 2.4 + lx, 0.46, z - 1.4 + lz), steel)
+
+    join_and_export(os.path.join(OUT, "ward-bay.glb"))
 
 
 # ---------------------------------------------------------------- characters
@@ -434,6 +526,7 @@ def patient_extras(add, m):
 
 if __name__ == "__main__":
     build_world()
+    build_ward()
     build_character("doctor", {
         "skin": "#e9b98f", "hair": "#3a2a22", "top": "#2f8f8a", "coat": "#f7f7f2",
         "pants": "#2f8f8a", "shoe": "#2b3a44",
