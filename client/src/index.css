@@ -49,9 +49,9 @@
   --color-beacon-foreground: var(--beacon-foreground);
   --color-telemetry: var(--telemetry);
   --color-success: var(--success);
-  --font-display: "Space Grotesk", sans-serif;
-  --font-sans: "Manrope", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Pixelify Sans", monospace;
+  --font-sans: "Pixelify Sans", monospace;
+  --font-mono: "Pixelify Sans", monospace;
 }
 
 :root {
@@ -134,7 +134,10 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Manrope", sans-serif;
+    font-family: "Pixelify Sans", monospace;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+    letter-spacing: 0.02em;
+    -webkit-font-smoothing: none;
     background-image:
       linear-gradient(rgba(56, 189, 248, 0.025) 1px, transparent 1px),
       linear-gradient(90deg, rgba(56, 189, 248, 0.025) 1px, transparent 1px);
@@ -183,7 +186,7 @@
   }
 
   .font-display {
-    font-family: "Space Grotesk", sans-serif;
+    font-family: "Pixelify Sans", monospace;
   }
 
   /* Phone-first touch helpers */
@@ -206,7 +209,7 @@
   }
 
   .font-telemetry {
-    font-family: "JetBrains Mono", monospace;
+    font-family: "Pixelify Sans", monospace;
   }
 
   /* Hairline ruled panel (instrument look) */
@@ -303,3 +306,7 @@
       inset -3px -3px 7px rgba(255, 255, 255, 0.8);
   }
 }
+
+/* PS2 text: pixel font everywhere, hard drop shadow; light clay panels get a white shadow instead. */
+button, input, select, textarea { font-family: inherit; }
+.clay-card, .clay-card * { text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.85); }

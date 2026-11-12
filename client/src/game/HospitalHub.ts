@@ -101,6 +101,8 @@ class HubInput {
   }
 }
 
+const SIGN_FONT = '"Pixelify Sans", monospace';
+
 export class HospitalHub {
   private camera: FreeCamera;
   private doctor: HubDoctor3D;
@@ -208,14 +210,19 @@ export class HospitalHub {
   private roomSign(room: HubRoom) {
     const texture = new DynamicTexture(`roomSign${room.levelIndex}`, { width: 768, height: 180 }, this.scene, false);
     texture.hasAlpha = true;
-    const context = texture.getContext();
-    context.fillStyle = "#f4ead7";
-    context.fillRect(0, 0, 768, 180);
-    context.strokeStyle = room.tint;
-    context.lineWidth = 12;
-    context.strokeRect(8, 8, 752, 164);
-    texture.drawText(`LEVEL ${room.levelIndex + 1}`, null, 77, "bold 38px monospace", "#28444c", "#f4ead7", true, true);
-    texture.drawText(room.name.toUpperCase(), null, 132, "bold 27px monospace", "#28444c", null, true, true);
+    const paint = () => {
+      const context = texture.getContext();
+      context.fillStyle = "#f4ead7";
+      context.fillRect(0, 0, 768, 180);
+      context.strokeStyle = room.tint;
+      context.lineWidth = 12;
+      context.strokeRect(8, 8, 752, 164);
+      texture.drawText(`LEVEL ${room.levelIndex + 1}`, null, 77, `700 40px ${SIGN_FONT}`, "#28444c", "#f4ead7", true, true);
+      texture.drawText(room.name.toUpperCase(), null, 132, `600 28px ${SIGN_FONT}`, "#28444c", null, true, true);
+    };
+    paint();
+    // Repaint once the pixel font is ready; the first paint uses the fallback.
+    void document.fonts?.load(`700 40px ${SIGN_FONT}`).then(() => !this.disposed && paint()).catch(() => undefined);
     texture.updateSamplingMode(Texture.NEAREST_SAMPLINGMODE);
 
     const material = new StandardMaterial(`roomSignMaterial${room.levelIndex}`, this.scene);
