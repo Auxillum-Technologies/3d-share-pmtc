@@ -217,27 +217,27 @@ export default function Adventure() {
 
       {/* Briefing overlay */}
       {phase === "briefing" && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[oklch(0.12_0.02_252/0.92)] p-4 backdrop-blur-md">
-          <div className="w-full max-w-md border border-cyan-900/70 bg-[oklch(0.17_0.02_252)] p-6 shadow-2xl">
-            <div className="font-telemetry text-[10px] uppercase tracking-[0.25em] text-amber-400">
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#3b3340]/35 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md clay-card p-6 sm:p-8">
+            <div className="font-telemetry text-[10px] uppercase tracking-[0.25em] text-amber-700">
               Hospital Adventure — Pre-Walk Briefing
             </div>
-            <div className="mt-1 font-telemetry text-[10px] text-cyan-400">
+            <div className="mt-1 font-telemetry text-[10px] text-teal-700">
               LEVEL {level.id}/5 · BEST {scores[levelIndex] ?? 0}/10
             </div>
-            <h1 className="mt-2 font-display text-2xl font-bold text-white">{level.name}</h1>
-            <p className="mt-1 text-sm italic text-amber-300/90">"{level.tagline}"</p>
-            <p className="mt-3 text-sm leading-relaxed text-slate-300">{level.focus}</p>
-            <div className="mt-4 space-y-2 border-t border-cyan-900/50 pt-3 text-xs text-slate-400">
+            <h1 className="mt-2 font-display text-2xl font-bold text-[#3b3340]">{level.name}</h1>
+            <p className="mt-1 text-sm italic text-amber-700">"{level.tagline}"</p>
+            <p className="mt-3 text-sm leading-relaxed text-[#5a4f5e]">{level.focus}</p>
+            <div className="mt-5 space-y-2 pt-1 text-xs text-[#7d7081]">
               <p className="flex items-center gap-2">
-                <kbd className="rounded border border-cyan-800 bg-cyan-950 px-1.5 py-0.5 font-telemetry">A/D</kbd>
+                <kbd className="clay-inset px-2 py-0.5 font-telemetry text-[#3b3340]">A/D</kbd>
                 or arrows to walk · jump over gaps
               </p>
               <p>Run down the corridor and reach each patient's bed to assess them.</p>
-              <p className="font-telemetry text-amber-300">Score ≥ 6/10 to open the next floor.</p>
+              <p className="font-telemetry text-amber-800">Score ≥ 6/10 to open the next floor.</p>
             </div>
             <div className="mt-5 flex gap-2">
-              <Button variant="outline" onClick={abort} className="flex-1 border-cyan-900 text-cyan-200">
+              <Button variant="outline" onClick={abort} className="clay-button flex-1 border-0 bg-stone-100 text-[#3b3340] hover:bg-stone-50">
                 Back
               </Button>
               {!playerInfo.fullName ||
@@ -245,14 +245,14 @@ export default function Adventure() {
               playerInfo.fullName === "Clinician Operator" ? (
                 <Button
                   onClick={() => setRegOpen(true)}
-                  className="flex-1 bg-amber-500 font-semibold text-slate-950 hover:bg-amber-400"
+                  className="clay-button flex-1 bg-amber-300 font-semibold text-[#3b3340] hover:bg-amber-200"
                 >
                   Register First
                 </Button>
               ) : (
                 <Button
                   onClick={startPlay}
-                  className="flex-1 bg-amber-500 font-semibold text-slate-950 hover:bg-amber-400"
+                  className="clay-button flex-1 bg-amber-300 font-semibold text-[#3b3340] hover:bg-amber-200"
                 >
                   Begin Walk
                 </Button>
