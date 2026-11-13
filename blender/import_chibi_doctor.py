@@ -14,6 +14,8 @@ from mathutils import Matrix, Quaternion, Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__)) if "__file__" in globals() else os.getcwd()
 ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+from uv_island_margin import repack  # noqa: E402
 SRC = os.path.join(HERE, "source", "chibi_doctor.glb")
 OUT = os.path.join(ROOT, "client", "public", "game-assets", "3d", "doctor.glb")
 HEIGHT = 4.7  # matches the old procedural doctor in the Babylon hub
@@ -145,7 +147,8 @@ def export(path):
 
 def build(src=SRC, tex=TEX_SIZE):
     clear_scene()
-    arm, _ = import_model(src)
+    arm, body = import_model(src)
+    repack(body)
     shrink_textures(tex)
     make_clips(arm)
     return arm
