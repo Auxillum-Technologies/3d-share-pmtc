@@ -267,53 +267,53 @@ export default function Adventure() {
         <div className="absolute inset-0 z-20 flex items-end justify-center bg-[#3b3340]/35 backdrop-blur-sm p-2 sm:items-center sm:p-4">
           <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto clay-card p-5 sm:p-7">
             <div className="flex items-center justify-between">
-              <div className="font-telemetry text-[10px] uppercase tracking-[0.25em] text-amber-700">
+              <div className="font-telemetry text-[12px] uppercase tracking-[0.25em] text-amber-700">
                 Patient Encounter
               </div>
               <Activity className="h-4 w-4 text-teal-600" />
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-2">
-              <h2 className="font-display text-xl font-bold text-[#3b3340]">{near.patient.name}</h2>
-              <span className="font-telemetry text-xs text-teal-700">
+              <h2 className="font-display text-2xl font-bold text-[#3b3340]">{near.patient.name}</h2>
+              <span className="font-telemetry text-[14.4px] text-teal-700">
                 {near.patient.age}y · {near.patient.sex === "M" ? "Male" : "Female"} · {near.patient.unit}
               </span>
-              <span className="font-telemetry text-xs text-[#7d7081]">Charted {near.patient.hour}</span>
+              <span className="font-telemetry text-[14.4px] text-[#7d7081]">Charted {near.patient.hour}</span>
             </div>
             <div className="mt-4 pt-1">
-              <div className="text-[10px] font-telemetry uppercase tracking-widest text-[#7d7081]">
+              <div className="text-[12px] font-telemetry uppercase tracking-widest text-[#7d7081]">
                 Primary Diagnosis / Source Term
               </div>
-              <div className="mt-1 flex items-center gap-2 text-sm font-semibold text-[#3b3340]">
+              <div className="mt-1 flex items-center gap-2 text-[16.8px] font-semibold text-[#3b3340]">
                 <Heart className="h-4 w-4 text-rose-500" />
                 {near.patient.diagnosis}
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div className="clay-tile p-3.5">
-                <div className="flex items-center gap-1 text-[10px] font-telemetry uppercase tracking-widest text-teal-700">
+                <div className="flex items-center gap-1 text-[12px] font-telemetry uppercase tracking-widest text-teal-700">
                   <AlertTriangle className="h-3 w-3" /> GCS
                 </div>
-                <div className="mt-1 text-2xl font-bold text-amber-600">{near.patient.gcs.score}</div>
-                <div className="text-[11px] text-[#7d7081]">{near.patient.gcs.note}</div>
+                <div className="mt-1 text-[28.8px] font-bold text-amber-600">{near.patient.gcs.score}</div>
+                <div className="text-[13.2px] text-[#7d7081]">{near.patient.gcs.note}</div>
               </div>
               <div className="clay-tile p-3.5">
-                <div className="flex items-center gap-1 text-[10px] font-telemetry uppercase tracking-widest text-teal-700">
+                <div className="flex items-center gap-1 text-[12px] font-telemetry uppercase tracking-widest text-teal-700">
                   <Wind className="h-3 w-3" /> Ventilation
                 </div>
-                <div className={`mt-1 text-sm font-bold ${near.patient.ventilated.onVent ? "text-teal-700" : "text-[#7d7081]"}`}>
+                <div className={`mt-1 text-[16.8px] font-bold ${near.patient.ventilated.onVent ? "text-teal-700" : "text-[#7d7081]"}`}>
                   {near.patient.ventilated.onVent ? "ON VENT" : "NOT VENTILATED"}
                 </div>
-                <div className="text-[11px] text-[#7d7081]">{near.patient.ventilated.note}</div>
+                <div className="text-[13.2px] text-[#7d7081]">{near.patient.ventilated.note}</div>
               </div>
             </div>
             {near.patient.brainDeathEval && (
-              <div className="mt-3 flex items-center gap-2 clay-inset p-2.5 text-xs text-amber-800">
+              <div className="mt-3 flex items-center gap-2 clay-inset p-2.5 text-[14.4px] text-amber-800">
                 <Brain className="h-4 w-4" />
                 High-priority flag: brain-death evaluation in progress
               </div>
             )}
             <div className="mt-3">
-              <div className="text-[10px] font-telemetry uppercase tracking-widest text-[#7d7081]">
+              <div className="text-[12px] font-telemetry uppercase tracking-widest text-[#7d7081]">
                 Latest Laboratory Results
               </div>
               <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -322,9 +322,9 @@ export default function Adventure() {
                     key={lab.name}
                     className="clay-inset flex flex-wrap items-baseline gap-x-1.5 px-2.5 py-2"
                   >
-                    <span className="text-[11px] text-[#5a4f5e] whitespace-nowrap">{lab.name}</span>
+                    <span className="text-[13.2px] text-[#5a4f5e] whitespace-nowrap">{lab.name}</span>
                     <span
-                      className={`font-telemetry text-xs font-bold whitespace-nowrap ${
+                      className={`font-telemetry text-[14.4px] font-bold whitespace-nowrap ${
                         lab.flag === "HIGH"
                           ? "text-rose-600"
                           : lab.flag === "LOW"
@@ -337,7 +337,7 @@ export default function Adventure() {
                     </span>
                     {lab.flag && (
                       <span
-                        className={`text-[9px] font-bold ${lab.flag === "HIGH" ? "text-rose-600/80" : "text-amber-700/80"}`}
+                        className={`text-[10.8px] font-bold ${lab.flag === "HIGH" ? "text-rose-600/80" : "text-amber-700/80"}`}
                       >
                         {lab.flag}
                       </span>
@@ -345,7 +345,7 @@ export default function Adventure() {
                   </div>
                 ))}
               </div>
-              <div className="mt-2 text-[11px] text-[#7d7081] leading-snug">
+              <div className="mt-2 text-[13.2px] text-[#7d7081] leading-snug">
                 {near.patient.labs[0]?.note}
               </div>
             </div>
@@ -504,8 +504,8 @@ function ActionButton({
       className={`clay-button flex w-full items-start gap-3 px-5 py-3.5 text-left ${styles}`}
     >
       <div>
-        <div className="font-display text-sm font-bold">{title}</div>
-        <div className="text-xs opacity-70">{sub}</div>
+        <div className="font-display text-[16.8px] font-bold">{title}</div>
+        <div className="text-[14.4px] opacity-70">{sub}</div>
       </div>
       <X className="ml-auto mt-1 h-4 w-4 shrink-0 opacity-30" />
     </button>
