@@ -212,6 +212,11 @@
     font-family: "Pixelify Sans", monospace;
   }
 
+  /* Pixelify Sans draws 5 like S; numeric readouts use a plain mono face */
+  .font-numeric {
+    font-family: ui-monospace, Consolas, "Courier New", monospace;
+  }
+
   /* Hairline ruled panel (instrument look) */
   .panel {
     background: oklch(0.21 0.022 252 / 0.85);

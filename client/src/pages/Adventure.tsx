@@ -293,7 +293,7 @@ export default function Adventure() {
                 <div className="flex items-center gap-1 text-[14.4px] font-telemetry uppercase tracking-widest text-teal-700">
                   <AlertTriangle className="h-3 w-3" /> GCS
                 </div>
-                <div className="mt-1 text-[34.56px] font-bold text-amber-600">{near.patient.gcs.score}</div>
+                <div className="font-numeric mt-1 text-[34.56px] font-bold text-amber-600">{near.patient.gcs.score}</div>
                 <div className="text-[15.84px] text-[#7d7081]">{near.patient.gcs.note}</div>
               </div>
               <div className="clay-tile p-3">
@@ -324,7 +324,7 @@ export default function Adventure() {
                   >
                     <span className="text-[15.84px] text-[#5a4f5e] whitespace-nowrap">{lab.name}</span>
                     <span
-                      className={`font-telemetry text-[17.28px] font-bold whitespace-nowrap ${
+                      className={`font-numeric text-[17.28px] font-bold whitespace-nowrap ${
                         lab.flag === "HIGH"
                           ? "text-rose-600"
                           : lab.flag === "LOW"
