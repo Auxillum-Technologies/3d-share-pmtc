@@ -3,6 +3,7 @@
 import "@babylonjs/loaders/glTF";
 import type { Scene } from "@babylonjs/core/scene";
 import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { AssetContainer } from "@babylonjs/core/assetContainer";
 import type { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -10,12 +11,22 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { ASSETS } from "./assets";
 
-export type CharacterKind = "doctor" | "nurse" | "patient";
+// Staff wear coats or scrubs; patients wear gowns.
+export type StaffKind = "drLara" | "drRamon" | "nurseMaria" | "nurseJames";
+export type PatientKind = "patientA" | "patientB" | "patientC";
+export type CharacterKind = "doctor" | "nurse" | "patient" | StaffKind | PatientKind;
 
 const MODEL_URLS: Record<CharacterKind, string> = {
   doctor: ASSETS.models.doctor,
   nurse: ASSETS.models.nurse,
   patient: ASSETS.models.patient,
+  drLara: ASSETS.models.drLara,
+  drRamon: ASSETS.models.drRamon,
+  nurseMaria: ASSETS.models.nurseMaria,
+  nurseJames: ASSETS.models.nurseJames,
+  patientA: ASSETS.models.patientA,
+  patientB: ASSETS.models.patientB,
+  patientC: ASSETS.models.patientC,
 };
 
 // One container per model; NPCs are instantiated from it.
@@ -27,7 +38,11 @@ export class CharacterLibrary {
   load(kind: CharacterKind) {
     let container = this.containers.get(kind);
     if (!container) {
-      container = LoadAssetContainerAsync(MODEL_URLS[kind], this.scene);
+      container = LoadAssetContainerAsync(MODEL_URLS[kind], this.scene).then((c) => {
+        // UV islands touch edge to edge, so mip levels blend them into visible seams.
+        c.textures.forEach((t) => (t as Texture).updateSamplingMode?.(Texture.BILINEAR_SAMPLINGMODE));
+        return c;
+      });
       this.containers.set(kind, container);
     }
     return container;
@@ -111,28 +126,26 @@ export class HubDoctor3D {
   }
 }
 
-interface NpcSpec {
-  kind: CharacterKind;
-  position: Vector3;
-  heading: number;
-  pose?: "lying";
-  patrol?: { from: Vector3; to: Vector3; speed: number };
-}
+type NpcSpec =
+  | { kind: StaffKind; position: Vector3; heading: number; patrol?: { from: Vector3; to: Vector3; speed: number } }
+  | { kind: PatientKind; position: Vector3; heading: number; pose?: "lying" };
 
 const NPCS: NpcSpec[] = [
-  { kind: "nurse", position: new Vector3(0, 0, 72.4), heading: Math.PI },
-  { kind: "nurse", position: new Vector3(-4, 0, 18), heading: 0, patrol: { from: new Vector3(-4, 0, 16), to: new Vector3(-4, 0, 56), speed: 2.2 } },
-  { kind: "patient", position: new Vector3(7.1, 0, 10.2), heading: -Math.PI / 2 },
-  { kind: "patient", position: new Vector3(-7.1, 0, 37.8), heading: Math.PI / 2 },
-  { kind: "patient", position: new Vector3(8.3, 1.45, 5.5), heading: 0, pose: "lying" },
-  { kind: "patient", position: new Vector3(-8.3, 1.45, 31.9), heading: 0, pose: "lying" },
+  { kind: "drRamon", position: new Vector3(0, 0, 72.4), heading: Math.PI },
+  { kind: "nurseMaria", position: new Vector3(-4, 0, 18), heading: 0, patrol: { from: new Vector3(-4, 0, 16), to: new Vector3(-4, 0, 56), speed: 2.2 } },
+  { kind: "nurseJames", position: new Vector3(4, 0, 54), heading: Math.PI, patrol: { from: new Vector3(4, 0, 56), to: new Vector3(4, 0, 16), speed: 2 } },
+  { kind: "drLara", position: new Vector3(-5.8, 0, 31.9), heading: -Math.PI / 2 },
+  { kind: "patientA", position: new Vector3(7.1, 0, 10.2), heading: -Math.PI / 2 },
+  { kind: "patientB", position: new Vector3(-7.1, 0, 37.8), heading: Math.PI / 2 },
+  { kind: "patientC", position: new Vector3(8.3, 1.45, 5.5), heading: 0, pose: "lying" },
+  { kind: "patientB", position: new Vector3(-8.3, 1.45, 31.9), heading: 0, pose: "lying" },
 ];
 
 // Ambient NPCs: a nurse at the station, a nurse on rounds, patients waiting or in gurneys.
 export class HubNpcs {
   private roots: TransformNode[] = [];
   private animators: CharacterAnimator[] = [];
-  private patrols: { root: TransformNode; spec: NonNullable<NpcSpec["patrol"]>; dir: 1 | -1 }[] = [];
+  private patrols: { root: TransformNode; spec: { from: Vector3; to: Vector3; speed: number }; dir: 1 | -1 }[] = [];
   private disposed = false;
 
   constructor(scene: Scene, library: CharacterLibrary, shadows?: ShadowGenerator) {
@@ -140,17 +153,18 @@ export class HubNpcs {
       const root = new TransformNode(`npc${index}`, scene);
       root.position.copyFrom(spec.position);
       root.rotation.y = spec.heading;
-      if (spec.pose === "lying") {
+      const patrol = "patrol" in spec ? spec.patrol : undefined;
+      if ("pose" in spec && spec.pose === "lying") {
         root.rotation.x = -Math.PI / 2;
         root.scaling.setAll(0.85);
       }
       this.roots.push(root);
-      if (spec.patrol) this.patrols.push({ root, spec: spec.patrol, dir: 1 });
+      if (patrol) this.patrols.push({ root, spec: patrol, dir: 1 });
       library.spawn(spec.kind, root, shadows)
         .then((animator) => {
           if (!animator) return;
           if (this.disposed) return animator.dispose();
-          animator.play(spec.patrol ? "walk" : "idle", spec.patrol ? 0.9 : 0.6 + (index % 3) * 0.15);
+          animator.play(patrol ? "walk" : "idle", patrol ? 0.9 : 0.6 + (index % 3) * 0.15);
           this.animators.push(animator);
         })
         .catch((error) => console.error("[HubNpcs] model load failed", error));
