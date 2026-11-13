@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "wouter";
 import GameCanvas from "@/components/GameCanvas";
+import GcsBreakdown from "@/components/GcsBreakdown";
 import PlayerLoginModal from "@/components/PlayerLoginModal";
 import { Button } from "@/components/ui/button";
 import { levels, type Action, type Patient } from "@/lib/patients";
@@ -294,7 +295,7 @@ export default function Adventure() {
                   <AlertTriangle className="h-3 w-3" /> GCS
                 </div>
                 <div className="font-numeric mt-1 text-[34.56px] font-bold text-amber-600">{near.patient.gcs.score}</div>
-                <div className="text-[15.84px] text-[#7d7081]">{near.patient.gcs.note}</div>
+                <GcsBreakdown note={near.patient.gcs.note} />
               </div>
               <div className="clay-tile p-3">
                 <div className="flex items-center gap-1 text-[14.4px] font-telemetry uppercase tracking-widest text-teal-700">
