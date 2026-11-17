@@ -18,7 +18,7 @@ export default function HospitalHub() {
   };
 
   return (
-    <main className="fixed inset-0 overflow-hidden bg-[#06131a] text-white">
+    <main onContextMenu={(e) => e.preventDefault()} className="fixed inset-0 overflow-hidden [-webkit-touch-callout:none] bg-[#06131a] text-white">
       <HospitalHubCanvas
         onDoorChange={setNearRoom}
         onEnterRoom={(levelIndex) => navigate(`/adventure?level=${levelIndex}`)}
@@ -73,6 +73,8 @@ function TouchButton({ label, onPress }: { label: string; onPress: (pressed: boo
       onPointerDown={(event) => { event.preventDefault(); onPress(true); }}
       onPointerUp={() => onPress(false)}
       onPointerLeave={() => onPress(false)}
+      onPointerCancel={() => onPress(false)}
+      onContextMenu={(event) => event.preventDefault()}
     >
       {label}
     </button>

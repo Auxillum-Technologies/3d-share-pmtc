@@ -183,7 +183,7 @@ export default function Adventure() {
   const scores = loadScores();
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[oklch(0.16_0.02_252)]">
+    <div onContextMenu={(e) => e.preventDefault()} className="fixed inset-0 overflow-hidden [-webkit-touch-callout:none] bg-[oklch(0.16_0.02_252)]">
       <GameCanvas bridge={bridge} levelIndex={levelIndex} />
 
       {/* Top rail HUD */}
@@ -480,6 +480,8 @@ function TouchBtn({ label, onPress }: { label: string; onPress: (pressed: boolea
       }}
       onPointerUp={() => onPress(false)}
       onPointerLeave={() => onPress(false)}
+      onPointerCancel={() => onPress(false)}
+      onContextMenu={(e) => e.preventDefault()}
     >
       {label}
     </button>
