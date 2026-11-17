@@ -48,6 +48,10 @@ export const ASSETS = {
     patientA: `${BASE}/game-assets/3d/patient-a.glb`,
     patientB: `${BASE}/game-assets/3d/patient-b.glb`,
     patientC: `${BASE}/game-assets/3d/patient-c.glb`,
-    wardBay: `${BASE}/game-assets/3d/ward-bay.glb`,
+    // Old designs for the lobby: they keep idle and walk clips.
+    patientALobby: `${BASE}/game-assets/3d/patient-a-lobby.glb`,
+    patientBLobby: `${BASE}/game-assets/3d/patient-b-lobby.glb`,
+    patientCLobby: `${BASE}/game-assets/3d/patient-c-lobby.glb`,
+    wardBay: `${BASE}/game-assets/3d/ward-module.glb`,
   },
 } as const;

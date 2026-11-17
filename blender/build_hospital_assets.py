@@ -250,12 +250,6 @@ def build_world():
         bench(f"bench_{z}", -side * 8.6, z, -side)
         plant(f"plant_{z}a", -side * 8.6, z - 3.4)
         plant(f"plant_{z}b", -side * 8.6, z + 3.4)
-    # Gurneys parked along walls with monitors.
-    for i, (side, z) in enumerate([(1, 3.6), (-1, 30), (1, 42), (-1, 54), (1, 66)]):
-        bed(f"gurney_{i}", side * 8.3, z, 0)
-        monitor(f"monitor_{i}", side * 8.9, z - 2.8)
-        iv_stand(f"iv_{i}", side * 7.0, z - 2.4)
-
     # Nurse station near the far end.
     box("stationDesk", (8.0, 1.6, 1.4), (0, 0.8, 70), counter, bevel=0.06)
     box("stationTop", (8.4, 0.12, 1.8), (0, 1.66, 70), wood, bevel=0.03)

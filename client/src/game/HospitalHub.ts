@@ -17,6 +17,7 @@ import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator"
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { CharacterLibrary, HubDoctor3D, HubNpcs } from "./hubCharacters";
+import { placeProps, type PropPlacement } from "./wardProps";
 
 export type HubMoveDirection = "forward" | "backward" | "left" | "right";
 
@@ -47,6 +48,16 @@ const PLAYER_SPEED = 6.2;
 const DOOR_TRIGGER_DISTANCE = 3.15;
 const CAMERA_FOLLOW_RATE = 0.1;
 const CAMERA_OFFSET = new Vector3(0, 7.2, -10.5);
+// Lobby dressing in wall gaps between doors, benches and plants; walls at x +-9.4.
+const LOBBY_PROPS: PropPlacement[] = [
+  { prop: "visitor-chair", x: 8.5, y: 0, z: 17.6, scale: 0.8, rotY: -Math.PI / 2 },
+  { prop: "visitor-chair", x: 8.5, y: 0, z: 19.3, scale: 0.8, rotY: -Math.PI / 2 },
+  { prop: "visitor-chair", x: -8.5, y: 0, z: 30.0, scale: 0.8, rotY: Math.PI / 2 },
+  { prop: "visitor-chair", x: -8.5, y: 0, z: 31.7, scale: 0.8, rotY: Math.PI / 2 },
+  { prop: "visitor-chair", x: 8.5, y: 0, z: 41.6, scale: 0.8, rotY: -Math.PI / 2 },
+  { prop: "visitor-chair", x: 8.5, y: 0, z: 43.3, scale: 0.8, rotY: -Math.PI / 2 },
+  { prop: "plant", x: -8.6, y: 0, z: 66, scale: 1.6 },
+];
 const DOOR_LAYOUT = [
   { side: -1 as const, z: 12, tint: "#78a98e" },
   { side: 1 as const, z: 24, tint: "#77a9c9" },
@@ -192,6 +203,7 @@ export class HospitalHub {
         this.disposables.push(container);
       })
       .catch((error) => console.error("[HospitalHub] world load failed", error));
+    void placeProps(this.scene, LOBBY_PROPS, this.shadows, () => this.disposed, (d) => this.disposables.push(d));
     this.rooms.forEach((room) => this.buildRoom(room, darkMaterial, trimMaterial));
   }
 

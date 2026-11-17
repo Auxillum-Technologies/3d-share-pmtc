@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "wouter";
 import GameCanvas from "@/components/GameCanvas";
+import PhoneControlsGuide from "@/components/PhoneControlsGuide";
 import GcsBreakdown from "@/components/GcsBreakdown";
 import PlayerLoginModal from "@/components/PlayerLoginModal";
 import { Button } from "@/components/ui/button";
@@ -187,7 +188,7 @@ export default function Adventure() {
 
       {/* Top rail HUD */}
       {phase === "playing" && (
-        <div className="pointer-events-none absolute left-0 right-0 top-0 z-10 flex items-center justify-between border-b border-cyan-900/60 bg-[oklch(0.13_0.02_252/0.85)] px-3 py-2 backdrop-blur-sm sm:px-5">
+        <div className="pointer-events-none absolute left-0 right-0 top-0 z-10 flex items-center justify-between border-b border-cyan-900/60 bg-[oklch(0.13_0.02_252/0.85)] px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-sm sm:px-5 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]">
           <div className="flex items-center gap-2">
             <Stethoscope className="h-4 w-4 text-amber-400" />
             <span className="font-telemetry text-[10px] uppercase tracking-[0.2em] text-cyan-300 sm:text-xs">
@@ -209,7 +210,7 @@ export default function Adventure() {
             variant="ghost"
             size="sm"
             onClick={abort}
-            className="pointer-events-auto h-7 border border-red-900/60 px-2 font-telemetry text-[10px] uppercase tracking-wider text-red-300 sm:h-8 sm:px-3 sm:text-xs"
+            className="pointer-events-auto h-7 border touch:h-11 border-red-900/60 px-2 font-telemetry text-[10px] uppercase tracking-wider text-red-300 sm:h-8 sm:px-3 sm:text-xs"
           >
             Abort
           </Button>
@@ -219,7 +220,7 @@ export default function Adventure() {
       {/* Briefing overlay */}
       {phase === "briefing" && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#3b3340]/35 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md clay-card p-6 sm:p-8">
+          <div className="max-h-full w-full max-w-md overflow-y-auto clay-card p-6 sm:p-8 short:max-w-2xl short:p-5">
             <div className="font-telemetry text-[14.4px] uppercase tracking-[0.25em] text-amber-700">
               Hospital Adventure — Pre-Walk Briefing
             </div>
@@ -230,7 +231,8 @@ export default function Adventure() {
             <p className="mt-1 text-[20.16px] italic text-amber-700">"{level.tagline}"</p>
             <p className="mt-3 text-[20.16px] leading-relaxed text-[#5a4f5e]">{level.focus}</p>
             <div className="mt-5 space-y-2 pt-1 text-[17.28px] text-[#7d7081]">
-              <p className="flex items-center gap-2">
+              <p className="hidden touch:block">Hold ◀ ▶ at bottom left to walk · tap ▲ to jump over gaps</p>
+              <p className="flex items-center gap-2 touch:hidden">
                 <kbd className="clay-inset px-2 py-0.5 font-telemetry text-[#3b3340]">A/D</kbd>
                 or arrows to walk · jump over gaps
               </p>
@@ -238,7 +240,7 @@ export default function Adventure() {
               <p className="font-telemetry text-amber-800">Score ≥ 6/10 to open the next floor.</p>
             </div>
             <div className="mt-5 flex gap-2">
-              <Button variant="outline" onClick={abort} className="clay-button flex-1 border-0 bg-stone-100 text-[20.16px] text-[#3b3340] hover:bg-stone-50">
+              <Button variant="outline" onClick={abort} className="clay-button flex-1 touch:h-11 border-0 bg-stone-100 text-[20.16px] text-[#3b3340] hover:bg-stone-50">
                 Back
               </Button>
               {!playerInfo.fullName ||
@@ -246,14 +248,14 @@ export default function Adventure() {
               playerInfo.fullName === "Clinician Operator" ? (
                 <Button
                   onClick={() => setRegOpen(true)}
-                  className="clay-button flex-1 bg-amber-300 font-semibold text-[20.16px] text-[#3b3340] hover:bg-amber-200"
+                  className="clay-button flex-1 touch:h-11 bg-amber-300 font-semibold text-[20.16px] text-[#3b3340] hover:bg-amber-200"
                 >
                   Register First
                 </Button>
               ) : (
                 <Button
                   onClick={startPlay}
-                  className="clay-button flex-1 bg-amber-300 font-semibold text-[20.16px] text-[#3b3340] hover:bg-amber-200"
+                  className="clay-button flex-1 touch:h-11 bg-amber-300 font-semibold text-[20.16px] text-[#3b3340] hover:bg-amber-200"
                 >
                   Begin Walk
                 </Button>
@@ -439,7 +441,7 @@ export default function Adventure() {
 
       {/* Touch controls for phone */}
       {phase === "playing" && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-10 flex justify-between px-4 sm:hidden">
+        <div className="pointer-events-none absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-10 hidden justify-between pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] touch:flex">
           <div className="flex gap-2">
             <TouchBtn label="◀" onPress={(on) => touchBridge.current?.("left", on)} />
             <TouchBtn label="▶" onPress={(on) => touchBridge.current?.("right", on)} />
@@ -447,6 +449,7 @@ export default function Adventure() {
           <TouchBtn label="▲" onPress={(on) => on && touchJump.current?.()} />
         </div>
       )}
+      {phase === "playing" && <PhoneControlsGuide route="ward" />}
       {/* world handle wired via das-world-ready event (see effect above) */}
 
       {/* Registration gate — Adventure mode requires a registered player name
@@ -470,7 +473,7 @@ const touchJump = { current: null as (() => void) | null };
 function TouchBtn({ label, onPress }: { label: string; onPress: (pressed: boolean) => void }) {
   return (
     <button
-      className="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full border border-cyan-700/70 bg-[oklch(0.2_0.02_252/0.8)] text-xl font-bold text-cyan-200 active:scale-95 active:bg-cyan-800/60"
+      className="pointer-events-auto flex h-14 w-14 touch-none select-none items-center justify-center rounded-full border border-cyan-700/70 bg-[oklch(0.2_0.02_252/0.8)] text-xl font-bold text-cyan-200 active:scale-95 active:bg-cyan-800/60"
       onPointerDown={(e) => {
         e.preventDefault();
         onPress(true);
