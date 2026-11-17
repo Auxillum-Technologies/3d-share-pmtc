@@ -21,3 +21,8 @@ try {
 }
 
 startPs2TextEffects();
+
+// Touch long-press opens the browser menu over the game pad; block it page-wide on touch devices.
+if (window.matchMedia("(pointer: coarse)").matches) {
+  window.addEventListener("contextmenu", (event) => event.preventDefault(), { capture: true });
+}

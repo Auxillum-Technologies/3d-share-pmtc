@@ -211,6 +211,14 @@
     overscroll-behavior-y: contain;
   }
 
+  @media (pointer: coarse) {
+    body {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  }
+
   .font-telemetry {
     font-family: "Pixelify Sans", monospace;
   }
