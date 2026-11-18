@@ -48,6 +48,8 @@ export async function createGameScene(
   // surface the handlers for the React HUD to attach
   const hudHandlers = { move: touchHandlers.onMove, jump: touchHandlers.onJump };
   if (typeof window !== "undefined") {
+    // Stored too: the event fires before the parent page's listener mounts.
+    (window as unknown as Record<string, unknown>).__dasTouch = hudHandlers;
     window.dispatchEvent(
       new CustomEvent("das-touch-ready", { detail: { onMove: hudHandlers.move, onJump: hudHandlers.jump } }),
     );

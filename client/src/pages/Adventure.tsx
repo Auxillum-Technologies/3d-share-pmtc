@@ -104,8 +104,9 @@ export default function Adventure() {
     window.addEventListener("das-touch-ready", handler);
     // keep the bridge refs current so TouchBtn closures always call latest handlers
     const poll = window.setInterval(() => {
-      touchBridge.current = onMove;
-      touchJump.current = onJump;
+      const stored = (window as unknown as { __dasTouch?: { move?: typeof onMove; jump?: typeof onJump } }).__dasTouch;
+      touchBridge.current = onMove ?? stored?.move ?? null;
+      touchJump.current = onJump ?? stored?.jump ?? null;
     }, 100);
     return () => {
       window.removeEventListener("das-touch-ready", handler);
