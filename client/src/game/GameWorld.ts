@@ -49,9 +49,6 @@ export class GameWorld {
     private opts: Partial<SceneOptions> = {},
   ) {
     this.demo = opts.demo ?? false;
-    // Touch bridge hookup (options mutated above with handlers)
-    const handlers: NonNullable<SceneOptions["touchHandlers"]> = { onMove: undefined, onJump: undefined };
-    opts.touchHandlers = handlers;
 
     // --- Camera: perspective, side-on, follows player along X ---
     this.camera = new FreeCamera("cam", new Vector3(0, CAMERA_HEIGHT, CAMERA_Z), scene);

@@ -38,13 +38,15 @@ export async function createGameScene(
   const level = levels[levelIdx];
 
   const tintHues = [200, 215, 235, 255, 275];
+  // GameWorld fills this object; the HUD reads it after construction.
+  const touchHandlers: NonNullable<SceneOptions["touchHandlers"]> = options.touchHandlers ?? { onMove: undefined, onJump: undefined };
   const world = new GameWorld(scene, options.bridge, level, {
     demo: options.demo,
     tintHue: tintHues[levelIdx % tintHues.length],
-    touchHandlers: options.touchHandlers,
+    touchHandlers,
   });
   // surface the handlers for the React HUD to attach
-  const hudHandlers = { move: options.touchHandlers?.onMove, jump: options.touchHandlers?.onJump };
+  const hudHandlers = { move: touchHandlers.onMove, jump: touchHandlers.onJump };
   if (typeof window !== "undefined") {
     window.dispatchEvent(
       new CustomEvent("das-touch-ready", { detail: { onMove: hudHandlers.move, onJump: hudHandlers.jump } }),
